@@ -56,8 +56,3 @@ class Flame3DReconstructionNet(nn.Module):
         
         # 移除通道维度 (B, 1, D, H, W) -> (B, D, H, W)
         return reconstructed_3d.squeeze(1)
-
-# --- 运行数据生成 ---
-GRID_SIZE = 32
-NUM_PROJECTIONS = 3 # 假设我们使用3个投影角度
-NUM_SAMPLES = 1000  # 训练样本数

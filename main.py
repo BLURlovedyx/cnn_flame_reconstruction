@@ -2,7 +2,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
-from dataset.double_Gaussian import*
+from dataset.gaijin_double_g import*
 from c_net_1 import*
 
 # --- 运行数据生成 ---
