@@ -30,7 +30,7 @@ model = Flame3DReconstructionNet(input_channels=NUM_PROJECTIONS, output_size=GRI
 # 损失函数: 均方误差 (MSE)
 criterion = nn.MSELoss()
 # 优化器: Adam
-optimizer = optim.Adam(model.parameters(), lr=0.001)
+optimizer = optim.Adam(model.parameters(), lr=0.00001)
 
 # --- 训练参数 ---
 num_epochs = 50

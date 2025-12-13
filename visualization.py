@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from main import*
+import torch
+from main import model,X_train,Y_train,GRID_SIZE,device
 
 # 假设模型已经训练完成，并且我们有了 X_train, Y_train, model, device 等变量
 
@@ -14,7 +15,7 @@ def visualize_reconstruction(model, X_data, Y_data, sample_index, slice_dim=0, s
         Y_data (Tensor): 真实的 3D 模型数据集。
         sample_index (int): 要可视化的样本索引。
         slice_dim (int): 切片维度 (0=X, 1=Y, 2=Z)。
-        slice_idx (int): 切片索引 (例如，如果 size=32，取 16 为中心切片)。
+        slice_idx (int): 切片索引 (例如，如果 size=32,取 16 为中心切片)。
     """
     
     model.eval() # 切换到评估模式
