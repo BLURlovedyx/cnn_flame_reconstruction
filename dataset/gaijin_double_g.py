@@ -140,7 +140,7 @@ def project_3d_volume(volume, angle_deg):
     volume_np = volume.cpu().numpy() if torch.is_tensor(volume) else volume
     
     # 对体数据进行旋转（绕Z轴）
-    rotated_volume = rotate(volume_np, angle_deg, axes=(1,2), reshape=False, order=1)
+    rotated_volume = rotate(volume_np, angle_deg, axes=(0,1), reshape=False, order=1)
     
     # 沿X轴投影（求和）
     projection = np.sum(rotated_volume, axis=0)
@@ -201,4 +201,122 @@ def create_dataset(num_samples, grid_size, num_projections, use_random_angles=Tr
     return torch.stack(inputs), torch.stack(targets)
 
 
+def visualize_3d_gaussian(model_3d, title="3D Gaussian Distribution", threshold=0.1):
+    """
+    可视化3D高斯分布
+    
+    Args:
+        model_3d: 3D张量，形状为 (D, H, W)
+        title: 图像标题
+        threshold: 等值面阈值，控制显示的密度范围
+    """
+    # 转换为numpy数组
+    if torch.is_tensor(model_3d):
+        model_np = model_3d.cpu().numpy()
+    else:
+        model_np = model_3d
+    
+    D, H, W = model_np.shape
+    
+    # 创建3D坐标网格
+    x = np.linspace(-1, 1, W)
+    y = np.linspace(-1, 1, H)
+    z = np.linspace(-1, 1, D)
+    X, Y, Z = np.meshgrid(x, y, z, indexing='ij')
+    
+    # 创建图形
+    fig = plt.figure(figsize=(15, 5))
+    
+    # 方法1: 3D等值面图
+    ax1 = fig.add_subplot(131, projection='3d')
+    
+    # 使用等值面显示3D结构
+    # 找到高于阈值的点
+    mask = model_np > threshold
+    if np.any(mask):
+        scatter = ax1.scatter(X[mask], Y[mask], Z[mask], 
+                            c=model_np[mask], cmap='hot', 
+                            alpha=0.6, s=10, marker='o')
+        plt.colorbar(scatter, ax=ax1, shrink=0.6)
+    
+    ax1.set_title(f'{title}\n3D Scatter (threshold={threshold})')
+    ax1.set_xlabel('X')
+    ax1.set_ylabel('Y')
+    ax1.set_zlabel('Z')
+    ax1.set_xlim([-1, 1])
+    ax1.set_ylim([-1, 1])
+    ax1.set_zlim([-1, 1]) 
 
+def visualize_projections(projections, title="Projections"):
+    """可视化多个投影图像"""
+    num_projections = len(projections)
+    cols = min(4, num_projections)
+    rows = (num_projections + cols - 1) // cols
+    
+    fig, axes = plt.subplots(rows, cols, figsize=(cols*4, rows*4))
+    
+    if rows == 1 and cols == 1:
+        axes = np.array([[axes]])
+    elif rows == 1:
+        axes = axes.reshape(1, -1)
+    elif cols == 1:
+        axes = axes.reshape(-1, 1)
+    
+    for i, (ax, proj) in enumerate(zip(axes.flat, projections)):
+        proj_np = proj.cpu().numpy() if torch.is_tensor(proj) else proj
+        
+           # 逆时针旋转90度
+        proj_np_rotated = np.rot90(proj_np, k=1)  # k=1 表示逆时针旋转90度
+        
+        im = ax.imshow(proj_np_rotated, cmap='hot')
+        ax.set_title(f'Projection {i+1}')
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.axis('off')
+        plt.colorbar(im, ax=ax, shrink=0.8)
+    
+    # 隐藏多余的子图
+    for i in range(len(projections), rows*cols):
+        axes.flat[i].axis('off')
+    
+    fig.suptitle(title, fontsize=16)
+    plt.tight_layout()
+    return fig
+
+# 主程序
+# if __name__ == "__main__":
+#     # 设置随机种子以确保可重复性
+#     np.random.seed(42)
+#     torch.manual_seed(42)
+    
+#     # 生成一个样本
+#     print("Generating sample data with random projection angles...")
+#     grid_size = 32
+#     num_projections = 8
+    
+#     # 生成一个样本
+#     inputs, targets = create_dataset(
+#         num_samples=1, 
+#         grid_size=grid_size, 
+#         num_projections=num_projections,
+#         use_random_angles=True
+#     )
+    
+#     # 提取数据
+#     model_3d = targets[0]  # 3D模型
+#     projections = inputs[0]  # 2D投影列表
+    
+#     print(f"3D Model shape: {model_3d.shape}")
+#     print(f"Number of projections: {len(projections)}")
+#     print(f"Each projection shape: {projections[0].shape}")
+    
+#     # 可视化3D模型和投影
+#     print("\nVisualizing 3D model and projections...")
+#     # fig1 = visualize_3d_model(model_3d, "3D Double Gaussian Model")
+#     fig2 = visualize_projections(projections, f"{num_projections} Projections")
+    
+#     plt.show()
+    
+
+
+    
