@@ -1,0 +1,38 @@
+{
+  "flame_small": {
+    "path": "data\\flame_dataset\\flame_small.pt",
+    "config": {
+      "num_samples": 500,
+      "grid_size": 32,
+      "num_projections": 3,
+      "train_ratio": 0.8,
+      "train_samples": 400,
+      "val_samples": 100
+    },
+    "created_at": "2025-12-13 18:18:29"
+  },
+  "GAUSS_dataset_1000": {
+    "path": "data\\flame_dataset\\GAUSS_dataset_1000.pt",
+    "config": {
+      "num_samples": 1000,
+      "grid_size": 32,
+      "num_projections": 3,
+      "train_ratio": 0.8,
+      "train_samples": 800,
+      "val_samples": 200
+    },
+    "created_at": "2025-12-13 18:36:48"
+  },
+  "GAUSS_dataset_10000": {
+    "path": "data\\flame_dataset\\GAUSS_dataset_10000.pt",
+    "config": {
+      "num_samples": 10000,
+      "grid_size": 32,
+      "num_projections": 3,
+      "train_ratio": 0.8,
+      "train_samples": 8000,
+      "val_samples": 2000
+    },
+    "created_at": "2025-12-13 20:09:44"
+  }
+}

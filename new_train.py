@@ -7,8 +7,8 @@ from torch.utils.data import TensorDataset, DataLoader
 import matplotlib.pyplot as plt
 
 from dataset.gaijin_double_g import *
-from c_net_1 import *
-from dataload  import FlameDatasetManager
+from model.c_net_1 import *
+from dataset.dataload  import FlameDatasetManager
 
 # --- 运行数据生成 ---
 GRID_SIZE = 32
@@ -20,31 +20,10 @@ NUM_EPOCHS = 50
 LEARNING_RATE = 0.001
 
 
-# 最简单的使用方式
-dataset_manager = FlameDatasetManager()
-
-# 创建数据集（如果不存在）
-dataset_manager.create_and_save_dataset(
-    dataset_name="my_flame_dataset",
-    num_samples=1000,
-    grid_size=32,
-    num_projections=3
-)
-
-# 加载数据集
-data = dataset_manager.load_dataset("my_flame_dataset")
-
-# 或者直接检查数据集是否存在
-if dataset_manager.data_dir.exists():
-    print("数据集已存在，跳过生成...")
-    data = dataset_manager.load_dataset("flame_dataset")
-else:
-    # 生成并保存
-
-    print("正在生成数据集...")
-    X_all, Y_all = create_dataset(NUM_SAMPLES, GRID_SIZE, NUM_PROJECTIONS, use_random_angles=True)
-    print(f"输入形状 (2D 投影): {X_all.shape}")
-    print(f"输出形状 (3D 模型): {Y_all.shape}")
+manager = FlameDatasetManager("data/flame_dataset")
+data = manager.load_dataset("flame_small")
+X_all = torch.cat([data['X_train'], data['X_val']], dim=0)
+Y_all = torch.cat([data['Y_train'], data['Y_val']], dim=0)
 
 
 # --- 划分训练集和验证集 ---
@@ -75,7 +54,7 @@ model = Flame3DReconstructionNet(input_channels=NUM_PROJECTIONS, output_size=GRI
 # --- 损失函数和优化器 ---
 criterion = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
-scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5, verbose=True)
+scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5)
 
 # --- 训练和验证循环 ---
 print("\n开始训练模型...")
